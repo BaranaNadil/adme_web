@@ -24,7 +24,13 @@ jobs:
       - name: Test SSH connection
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
-          "whoami && hostname && pwd"
+          "echo '✅ Connected as:' $(whoami) && echo '📍 Host:' $(hostname)"
+
+      # 4. Run deployment script on VPS
+      - name: Deploy to VPS
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
+          "bash /home/deploy/deploy.sh"
 
 
 
