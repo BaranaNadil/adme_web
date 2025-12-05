@@ -1,31 +1,24 @@
-name: CI/CD Deploy to VPS
+name: Deploy
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout repository
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. Set up SSH agent with private key from secrets
-      - name: Set up SSH agent
-        uses: webfactory/ssh-agent@v0.9.0
+      - name: Copy to server
+        uses: appleboy/ssh-action@v1.0.0
         with:
-          ssh-private-key: ${{ secrets.VPS_KEY }}
-
-
-      # 4. Run deployment script on VPS
-      - name: Deploy to VPS
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
-          "bash /home/deploy/deploy.sh"
-
-
-
+          host: 72.62.64.184
+          username: deploy
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            cd /var/www/project
+            git pull origin main
+            pm2 restart all
